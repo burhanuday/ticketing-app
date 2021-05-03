@@ -1,74 +1,50 @@
-import request from "supertest";
-import { app } from "../../app";
+import request from 'supertest';
+import { app } from '../../app';
 
-it("returns a 400 with invalid email", async () => {
-  return request(app)
-    .post("/api/users/signin")
-    .send({
-      email: "test",
-      password: "password",
-    })
-    .expect(400);
-});
-
-it("returns a 400 with invalid password", async () => {
-  return request(app)
-    .post("/api/users/signin")
-    .send({
-      email: "test@test.com",
-      password: "",
-    })
-    .expect(400);
-});
-
-it("returns a 400 with missing email and password", async () => {
-  return request(app).post("/api/users/signin").send({}).expect(400);
-});
-
-it("fails when an email does not exist is given", async () => {
-  return request(app)
-    .post("/api/users/signin")
-    .send({
-      email: "test@test.com",
-      password: "",
-    })
-    .expect(400);
-});
-
-it("fails when an incorrect password is given", async () => {
+it('fails when a email that does not exist is supplied', async () => {
   await request(app)
-    .post("/api/users/signup")
+    .post('/api/users/signin')
     .send({
-      email: "test@test.com",
-      password: "password",
+      email: 'test@test.com',
+      password: 'password'
+    })
+    .expect(400);
+});
+
+it('fails when an incorrect password is supplied', async () => {
+  await request(app)
+    .post('/api/users/signup')
+    .send({
+      email: 'test@test.com',
+      password: 'password'
     })
     .expect(201);
 
-  return request(app)
-    .post("/api/users/signin")
+  await request(app)
+    .post('/api/users/signin')
     .send({
-      email: "test@test.com",
-      password: "pass",
+      email: 'test@test.com',
+      password: 'aslkdfjalskdfj'
     })
     .expect(400);
 });
 
-it("returns a cookie when given valid credentials", async () => {
+it('responds with a cookie when given valid credentials', async () => {
   await request(app)
-    .post("/api/users/signup")
+    .post('/api/users/signup')
     .send({
-      email: "test@test.com",
-      password: "password",
+      email: 'test@test.com',
+      password: 'password'
     })
     .expect(201);
 
   const response = await request(app)
-    .post("/api/users/signin")
+    .post('/api/users/signin')
     .send({
-      email: "test@test.com",
-      password: "password",
+      email: 'test@test.com',
+      password: 'password'
     })
     .expect(200);
 
-  expect(response.get("Set-Cookie")).toBeDefined();
+  expect(response.get('Set-Cookie')).toBeDefined();
 });
